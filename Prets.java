@@ -215,6 +215,7 @@ class Prets {
 
         // for the amount borrowed
         while (true){
+            scanner.nextLine();
             System.out.println("Entrer le montant emprunté");
             String montant = scanner.nextLine();
             if (valideMoney(montant)){
