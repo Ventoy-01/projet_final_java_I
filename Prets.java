@@ -43,7 +43,7 @@ class Prets {
         this.montantEmprunte = montantEmprunte;
         this.interet = montantEmprunte * 0.055;
         this.versementPeriodique = (montantEmprunte + interet) / 4;
-        this.datePret = new SimpleDateFormat("dd/MM/yyyy").format(new Date());
+        this.datePret = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date());
         this.versements = new double[4];
     }
 
@@ -51,6 +51,7 @@ class Prets {
      * The constructor without any parameters of class {@link #Prets}
      */
     public Prets() {
+        this.prets = new ArrayList<>();
     }
 
     public String getIdPret() {
@@ -150,19 +151,25 @@ class Prets {
     public int valideNiveau(){
         int choix;
         while (true) {
-            System.out.println("Menu pour le niveau:");
+            System.out.println("\nMenu pour le niveau:");
             System.out.println("2. Pour 2ème Année");
             System.out.println("3. Pour 3ème Année");
             System.out.println("4. Pour 4ème Année");
-            System.out.println("5. Quitter");
             System.out.print("Votre choix: ");
-            choix = scanner.nextInt();
+            String choixx = scanner.nextLine();
+
+            try{
+                choix = Integer.parseInt(choixx);
 
             if (choix >= 2 && choix <= 4) {
                 break;
             } else {
                 System.out.println("Votre choix est invalide, choisir (2, 3 ou 4)");
             }
+        }
+        catch (NumberFormatException e) {
+            System.out.println("\nVeuillez entrer un chiffre " + e.getMessage());
+        }
         }
         return choix;
     }
@@ -178,15 +185,18 @@ class Prets {
             Double.parseDouble(money);
             return true;
         } catch (NumberFormatException e) {
-            System.out.println("Veuillez entrer un nombre valide");
+            System.out.println("Veuillez entrer un nombre valide "+ e.getMessage());
         }
         return false;
     }
+
+    // public boolean valideMoney()
 
     /**
      * Registers a "pret" by prompting the user for input and validating it
      */
     public void enregistrerPret() {
+        System.out.println('\n');
         // for the student's last name
         while (true){
             String textNom = "Entrer le nom de l'étudiant: ";
@@ -212,7 +222,7 @@ class Prets {
         // for the student's level
         int niveau = valideNiveau();
         niveauEtudiant = niveau;
-
+        
         // for the amount borrowed
         while (true){
             scanner.nextLine();
@@ -225,15 +235,17 @@ class Prets {
                 System.out.println("Veuillez entrer un nombre valide");
             }
         }
+        idPret = "Pret-"+nomEtudiant.substring(0, 3)+prenomEtudiant.substring(0, 3)+'-'+ niveauEtudiant;
         Prets pret = new Prets(idPret, nomEtudiant, prenomEtudiant, niveauEtudiant, montantEmprunte);
         prets.add(pret);
-        System.out.println("Prêt enregistré avec succès.");
+        System.out.println("Prêt enregistré avec succès.\n");
     }
 
     /**
      * Displays the details of a "pret"
      */
     void afficher() {
+        System.out.println("\n");
         System.out.println("L'ID du prêt : " + idPret);
         System.out.println("Nom de l'étudiant : " + nomEtudiant);
         System.out.println("Prénom de l'étudiant : " + prenomEtudiant);
@@ -255,32 +267,50 @@ class Prets {
     public void afficherPrets() {
         for (Prets pret : prets) {
             pret.afficher();
-            System.out.println();
-        }
+            System.out.println();     
+    }
     }
 
     /**
      * Manages the "prets" by displaying a menu for the user to choose from
      */
     public void gererPrets() {
-        System.out.println("Gestion des prêts:");
+        int choix =0;
+        do{
+        System.out.println("\nGestion des prêts:");
         System.out.println("1. Enregistrer un prêt");
         System.out.println("2. Afficher tous les prêts");
+        System.out.println("3. Retour au menu principale");
         System.out.print("Votre choix: ");
-        int choix = scanner.nextInt();
-
+        String choixx = scanner.nextLine();
+        try{
+            choix = Integer.parseInt(choixx);
         switch (choix) {
             case 1:
                 enregistrerPret();
                 break;
             case 2:
+            if (prets.size() == 0){
+                System.out.println("\nPas de pret enregistrer!");
+            }
+            else{
                 afficherPrets();
+            }
+            break;
+            case 3:
                 break;
             default:
-                System.out.println("Choix invalide.");
+                System.out.println("\nChoix invalide.");
         }
     }
-
+    catch(NumberFormatException e){
+        System.out.println("\nVeuillez entrer un nombre entre 1 et 2 " + e.getMessage());
+    }
+}
+while(choix != 3);
+}
+    
+    
     /**
      * Updates the payment array for a specified "pret"
      * 
@@ -311,4 +341,5 @@ class Prets {
         }
         return 0;
     }
+   
 }
