@@ -140,8 +140,13 @@ public class Remboursements {
                 montantString = scanner.nextLine();
                 System.out.println("===============================================");
                 try {
-                    Double.parseDouble(montantString);
-                    break;
+                    double convert = Double.parseDouble(montantString);
+                    if(convert > 0){    
+                        break;
+                    }
+                    else{
+                        System.out.println("Le montant doit etre positif.");
+                    }
                 } catch (InputMismatchException e) {
                     System.out.println("Essayez des nombre reels!");
                 }
@@ -151,19 +156,19 @@ public class Remboursements {
             montantEnAttente += montant;
             // a veriifye
             if(montantEnAttente > versementPeriodique * 4){
-                System.out.println("Le montant entre + le montant en attente est superieur au somme dû " + versementPeriodique * 4);
+                System.out.println("Le montant entre + le montant en attente est superieur au somme dû " + montDu);
                 System.out.println("Verifiez si vous n'avez pas une somme en attente.");
                 return;
             }
             montantReste = montantEnAttente;
 
-            while (montantReste >= versementPeriodique && nbreEnregistrement < 5) {
+            while (montantReste >= versementPeriodique && numeroVersement < 5) {
                 idRemboursement = "R-" + idPret + "-" + numeroVersement;
                 String nomVersement = "Versement " + numeroVersement;
 
                 Remboursements remboursement = new Remboursements(idRemboursement, idPret, nomVersement, versementPeriodique, pret);
                 remboursement.versements.add(versementPeriodique); // Ajouter le versement à la liste
-                this.remboursements.add(remboursement);
+                this.remboursements.add(remboursement); 
 
                 numeroVersement++;
                 catchPret.setNumeroVersement(numeroVersement);
@@ -186,6 +191,10 @@ public class Remboursements {
                 System.out.println("Le montant en cours: " + montantReste);
                 System.out.println("==================================================================================");
             }
+            if (pret.getMontantDu() <= 0) {
+                pret.setEstPaye(true);  // Le prêt est marqué comme payé
+            }
+            
         }
     }
 
@@ -197,7 +206,7 @@ public class Remboursements {
             System.out.println("ID Pret: " + remboursement.getIdPret());
             System.out.println("Nom Versement: " + remboursement.getNomVersement());
             System.out.println("Date Remboursement: " + remboursement.getDateRemboursement());
-            System.out.println("==========================================");
+            System.out.println();
             i++;
         }
     }

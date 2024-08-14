@@ -43,7 +43,7 @@ public class Main {
                 }
             } 
             catch (NumberFormatException e) {
-                System.out.println("Veuillez entrer un nombre entre 1 et 3: " + e.getMessage());
+                System.out.println("Veuillez entrer un nombre entre 1 et 3: ");
             }
         } 
         while (choix != 3);

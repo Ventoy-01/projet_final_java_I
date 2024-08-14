@@ -19,9 +19,11 @@ public class Prets {
     private double versementPeriodique;
     private String datePret;
     private double montantDu;
-
+    
+    private boolean estPaye;
     private double montantEnAttente;
     private int numeroVersement = 1;
+    private static int countPret = 1;
 
     Scanner scanner = new Scanner(System.in);
     /**
@@ -38,8 +40,7 @@ public class Prets {
     * @param niveauEtudiant the student's level
     * @param montantEmprunte the amount borrowed
     */
-    Prets(String idPret, String nomEtudiant, String prenomEtudiant, int niveauEtudiant, double montantEmprunte) {
-        this.idPret = idPret;
+    Prets(String nomEtudiant, String prenomEtudiant, int niveauEtudiant, double montantEmprunte) {
         this.nomEtudiant = nomEtudiant;
         this.prenomEtudiant = prenomEtudiant;
         this.niveauEtudiant = niveauEtudiant;
@@ -47,8 +48,11 @@ public class Prets {
         this.interet = montantEmprunte * 0.055;
         this.montantDu = montantEmprunte + interet;
         this.versementPeriodique = montantDu / 4;
+        this.estPaye = false;  // Initialisation par défaut à false
         this.datePret = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date());
+        this.idPret =  ""+countPret++;
     }
+    
 
     /**
      * The constructor without any parameters of class {@link #Prets}
@@ -56,6 +60,26 @@ public class Prets {
     public Prets() {
         this.prets = new ArrayList<>();
 
+    }
+    // Constructeur et autres méthodes
+    
+
+    public boolean getEstPaye() {
+        return estPaye;
+    }
+
+    public static int getCountPret() {
+        return countPret;
+    }
+
+
+    public static void setCountPret(int countPret) {
+        Prets.countPret = countPret;
+    }
+
+
+    public void setEstPaye(boolean estPaye) {
+        this.estPaye = estPaye;
     }
     
     public int getNumeroVersement() {
@@ -211,34 +235,17 @@ public class Prets {
     }
 
     public boolean peutFaireUnPret(String nom, String prenom) {
-        // Initialisation des variables
-        boolean pretTrouve = false;
-        double montantDu = 0;
-    
-        // Parcours des prêts pour trouver celui de l'étudiant
         for (Prets pret : prets) {
             if (pret.getNomEtudiant().equals(nom) && pret.getPrenomEtudiant().equals(prenom)) {
-                montantDu = pret.getMontantDu();
-                pretTrouve = true;
-                break; // On peut arrêter la boucle une fois le prêt trouvé
+                // Si l'étudiant a un prêt non payé, il ne peut pas faire un autre prêt
+                if (!pret.getEstPaye() && pret.getMontantDu() > 0) {
+                    return false;
+                }
             }
         }
-    
-        // Vérification du montant dû
-        if (pretTrouve) {
-            if (montantDu > 0) {
-                // L'étudiant a un montant dû, il ne peut pas faire un nouveau prêt
-                return false;
-            } else {
-                // Le montant dû est zéro, l'étudiant peut faire un nouveau prêt
-                return true;
-            }
-        } else {
-            // Si aucun prêt n'a été trouvé, l'étudiant peut faire un nouveau prêt
-            return true;
-        }
-    }
-    
+        // L'étudiant peut faire un autre prêt si tous les prêts précédents sont payés
+        return true;
+    }    
     
     /**
      * Registers a "pret" by prompting the user for input and validating it
@@ -285,16 +292,20 @@ public class Prets {
                 String montant = scanner.nextLine();
                 if (valideMoney(montant)){
                     montantEmprunte = Double.parseDouble(montant);
-                    break;
+                    if(montantEmprunte > 0){
+                        break;
+                    }
+                    else{
+                        System.out.println("Le montant doit etre positif.");
+                    }
                 } else {
                     System.out.println("Veuillez entrer un nombre valide");
                 }
             }
-            idPret = "Pret-"+nomEtudiant.substring(0, 3)+prenomEtudiant.substring(0, 3)+'-'+ niveauEtudiant;
-            Prets pret = new Prets(idPret, nomEtudiant, prenomEtudiant, niveauEtudiant, montantEmprunte);
+            Prets pret = new Prets(nomEtudiant, prenomEtudiant, niveauEtudiant, montantEmprunte);
             prets.add(pret);
             System.out.println("Prêt enregistré avec succès.\n");
-        }
+            }
     }
 
     /**
