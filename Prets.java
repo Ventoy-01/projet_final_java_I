@@ -1,4 +1,4 @@
-// package pret.etudiant.gestion;
+//  package etudiant.pret.gestion;
 
 import java.text.SimpleDateFormat;
 import java.util.regex.Pattern;
@@ -7,9 +7,9 @@ import java.util.Scanner;
 import java.util.ArrayList;
 
 /**
- * The class for "prets" (prets)
- */
-class Prets {    
+* The class for "prets" (prets)
+*/
+public class Prets {    
     private String idPret;
     private String nomEtudiant;
     private String prenomEtudiant;
@@ -18,23 +18,26 @@ class Prets {
     private double interet;
     private double versementPeriodique;
     private String datePret;
-    private double versements[];
+    private double montantDu;
+
+    private double montantEnAttente;
+    private int numeroVersement = 1;
 
     Scanner scanner = new Scanner(System.in);
     /**
      * An ArrayList, it extends the {@link ArrayList} class
-     */
-    ArrayList<Prets> prets = new ArrayList<>();
+    */
+    private ArrayList<Prets> prets ;
 
     /**
      * The constructor with parameters of class {@link #Prets}
-     * 
-     * @param idPret the identification of the "pret"
-     * @param nomEtudiant the student's last name
-     * @param prenomEtudiant the student's first name
-     * @param niveauEtudiant the student's level
-     * @param montantEmprunte the amount borrowed
-     */
+    * 
+    * @param idPret the identification of the "pret"
+    * @param nomEtudiant the student's last name
+    * @param prenomEtudiant the student's first name
+    * @param niveauEtudiant the student's level
+    * @param montantEmprunte the amount borrowed
+    */
     Prets(String idPret, String nomEtudiant, String prenomEtudiant, int niveauEtudiant, double montantEmprunte) {
         this.idPret = idPret;
         this.nomEtudiant = nomEtudiant;
@@ -42,16 +45,25 @@ class Prets {
         this.niveauEtudiant = niveauEtudiant;
         this.montantEmprunte = montantEmprunte;
         this.interet = montantEmprunte * 0.055;
-        this.versementPeriodique = (montantEmprunte + interet) / 4;
+        this.montantDu = montantEmprunte + interet;
+        this.versementPeriodique = montantDu / 4;
         this.datePret = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date());
-        this.versements = new double[4];
     }
 
     /**
      * The constructor without any parameters of class {@link #Prets}
-     */
+    */
     public Prets() {
         this.prets = new ArrayList<>();
+
+    }
+    
+    public int getNumeroVersement() {
+        return numeroVersement;
+    }
+
+    public void setNumeroVersement(int numeroVersement) {
+        this.numeroVersement = numeroVersement;
     }
 
     public String getIdPret() {
@@ -117,22 +129,31 @@ class Prets {
     public void setDatePret(String datePret) {
         this.datePret = datePret;
     }
+    
 
-    public double[] getVersements() {
-        return versements;
+    public double getMontantDu() {
+        return montantDu;
     }
 
-    public void setVersements(double[] versements) {
-        this.versements = versements;
+    public void setMontantDu(double montantDu) {
+        this.montantDu = montantDu;
+    }
+
+    public double getMontantEnAttente() {
+        return montantEnAttente;
+    }
+
+    public void setMontantEnAttente(double montantEnAttente) {
+        this.montantEnAttente = montantEnAttente;
     }
 
     /**
      * Checks if a given string starts with an alpha character and contains only alphanumeric characters.
-     * The string length must be at least 3.
-     * 
-     * @param text the string to check
-     * @return the string if it matches the specified pattern, otherwise {@code null}
-     */
+    * The string length must be at least 3.
+    * 
+    * @param text the string to check
+    * @return the string if it matches the specified pattern, otherwise {@code null}
+    */
     public String valideInputText(String text){
         System.out.println(text);
         String textCatch = scanner.nextLine();
@@ -145,19 +166,18 @@ class Prets {
 
     /**
      * Validates the student's level
-     * 
-     * @return the valid level choice
-     */
+    * 
+    * @return the valid level choice
+    */
     public int valideNiveau(){
         int choix;
         while (true) {
             System.out.println("\nMenu pour le niveau:");
-            System.out.println("2. Pour 2ème Année");
-            System.out.println("3. Pour 3ème Année");
-            System.out.println("4. Pour 4ème Année");
+            System.out.println("2. Pour 2éme Année");
+            System.out.println("3. Pour 3éme Année");
+            System.out.println("4. Pour 4éme Année");
             System.out.print("Votre choix: ");
             String choixx = scanner.nextLine();
-
             try{
                 choix = Integer.parseInt(choixx);
 
@@ -176,10 +196,10 @@ class Prets {
 
     /**
      * Validates if the given string can be parsed to a double
-     * 
-     * @param money the string to check
-     * @return {@code true} if the string can be parsed to a double, otherwise {@code false}
-     */
+    * 
+    * @param money the string to check
+    * @return {@code true} if the string can be parsed to a double, otherwise {@code false}
+    */
     public boolean valideMoney(String money){
         try {
             Double.parseDouble(money);
@@ -190,17 +210,46 @@ class Prets {
         return false;
     }
 
-    // public boolean valideMoney()
-
+    public boolean peutFaireUnPret(String nom, String prenom) {
+        // Initialisation des variables
+        boolean pretTrouve = false;
+        double montantDu = 0;
+    
+        // Parcours des prêts pour trouver celui de l'étudiant
+        for (Prets pret : prets) {
+            if (pret.getNomEtudiant().equals(nom) && pret.getPrenomEtudiant().equals(prenom)) {
+                montantDu = pret.getMontantDu();
+                pretTrouve = true;
+                break; // On peut arrêter la boucle une fois le prêt trouvé
+            }
+        }
+    
+        // Vérification du montant dû
+        if (pretTrouve) {
+            if (montantDu > 0) {
+                // L'étudiant a un montant dû, il ne peut pas faire un nouveau prêt
+                return false;
+            } else {
+                // Le montant dû est zéro, l'étudiant peut faire un nouveau prêt
+                return true;
+            }
+        } else {
+            // Si aucun prêt n'a été trouvé, l'étudiant peut faire un nouveau prêt
+            return true;
+        }
+    }
+    
+    
     /**
      * Registers a "pret" by prompting the user for input and validating it
-     */
+    */
     public void enregistrerPret() {
-        System.out.println('\n');
+
+        System.out.println();
         // for the student's last name
         while (true){
             String textNom = "Entrer le nom de l'étudiant: ";
-            String catchNom = valideInputText(textNom);
+            String catchNom = valideInputText(textNom).toLowerCase();
             if (catchNom != null){
                 nomEtudiant = catchNom;
                 break;
@@ -211,7 +260,7 @@ class Prets {
         // for the student's first name
         while (true){
             String textPrenom = "Entrer le prénom de l'étudiant: ";
-            String catchPrenom = valideInputText(textPrenom);
+            String catchPrenom = valideInputText(textPrenom).toLowerCase();
             if (catchPrenom != null ){
                 prenomEtudiant = catchPrenom;
                 break;
@@ -219,127 +268,106 @@ class Prets {
                 System.out.println("Prénom invalide (seulement lettres (au commencement) et chiffres, min 3)");
             }
         }
-        // for the student's level
-        int niveau = valideNiveau();
-        niveauEtudiant = niveau;
-        
-        // for the amount borrowed
-        while (true){
-            scanner.nextLine();
-            System.out.println("Entrer le montant emprunté");
-            String montant = scanner.nextLine();
-            if (valideMoney(montant)){
-                montantEmprunte = Double.parseDouble(montant);
-                break;
-            } else {
-                System.out.println("Veuillez entrer un nombre valide");
-            }
+
+        boolean peutFaireUnPret = peutFaireUnPret(nomEtudiant, prenomEtudiant);
+        if(!peutFaireUnPret){
+            System.out.println("L'étudiant a un prêt en cours avec un montant dû. Il ne peut pas faire un autre versement.");
+            return;
         }
-        idPret = "Pret-"+nomEtudiant.substring(0, 3)+prenomEtudiant.substring(0, 3)+'-'+ niveauEtudiant;
-        Prets pret = new Prets(idPret, nomEtudiant, prenomEtudiant, niveauEtudiant, montantEmprunte);
-        prets.add(pret);
-        System.out.println("Prêt enregistré avec succès.\n");
+        else{
+            // for the student's level
+            int niveau = valideNiveau();
+            niveauEtudiant = niveau;
+            // for the amount borrowed
+            while (true){
+                scanner.nextLine();
+                System.out.println("Entrer le montant emprunté");
+                String montant = scanner.nextLine();
+                if (valideMoney(montant)){
+                    montantEmprunte = Double.parseDouble(montant);
+                    break;
+                } else {
+                    System.out.println("Veuillez entrer un nombre valide");
+                }
+            }
+            idPret = "Pret-"+nomEtudiant.substring(0, 3)+prenomEtudiant.substring(0, 3)+'-'+ niveauEtudiant;
+            Prets pret = new Prets(idPret, nomEtudiant, prenomEtudiant, niveauEtudiant, montantEmprunte);
+            prets.add(pret);
+            System.out.println("Prêt enregistré avec succès.\n");
+        }
     }
 
     /**
      * Displays the details of a "pret"
-     */
-    void afficher() {
-        System.out.println("\n");
-        System.out.println("L'ID du prêt : " + idPret);
-        System.out.println("Nom de l'étudiant : " + nomEtudiant);
-        System.out.println("Prénom de l'étudiant : " + prenomEtudiant);
-        System.out.println("Niveau de l'étudiant : " + niveauEtudiant);
-        System.out.println("Montant emprunté : " + montantEmprunte);
-        System.out.println("Intérêt : " + interet);
-        System.out.println("Versement périodique : " + versementPeriodique);
-        System.out.println("Date du prêt : " + datePret);
-        System.out.print("Versements : ");
-        for (double v : versements) {
-            System.out.print(v + " ");
-        }
-        System.out.println();
-    }
-
+    */
     /**
      * Displays all "prets" in the ArrayList {@code prets}
-     */
+    */
     public void afficherPrets() {
+        int i = 1;
         for (Prets pret : prets) {
-            pret.afficher();
-            System.out.println();     
+            System.out.println("=========================== PRET "+ i+ " =============================");
+            System.out.println("L'ID du prét : " + pret.getIdPret());
+            System.out.println("Nom de l'étudiant : " + pret.getNomEtudiant());
+            System.out.println("Prénom de l'étudiant : " + pret.getPrenomEtudiant());
+            System.out.println("Niveau de l'étudiant : " + pret.getNiveauEtudiant());
+            System.out.println("Montant emprunté : " + pret.getMontantEmprunte());
+            System.out.println("Intérét : " +pret.getInteret());
+            System.out.println("Versement périodique : " + pret.getVersementPeriodique());
+            System.out.println("Date du prét : " + pret.getDatePret());
+            i++;
+            System.out.println();
+        }
     }
-    }
+
 
     /**
      * Manages the "prets" by displaying a menu for the user to choose from
-     */
-    public void gererPrets() {
-        int choix =0;
-        do{
-        System.out.println("\nGestion des prêts:");
-        System.out.println("1. Enregistrer un prêt");
-        System.out.println("2. Afficher tous les prêts");
-        System.out.println("3. Retour au menu principale");
-        System.out.print("Votre choix: ");
-        String choixx = scanner.nextLine();
-        try{
-            choix = Integer.parseInt(choixx);
-        switch (choix) {
-            case 1:
-                enregistrerPret();
-                break;
-            case 2:
-            if (prets.size() == 0){
-                System.out.println("\nPas de pret enregistrer!");
-            }
-            else{
-                afficherPrets();
-            }
-            break;
-            case 3:
-                break;
-            default:
-                System.out.println("\nChoix invalide.");
+    */
+        public void gererPrets() {
+            int choix =0;
+            do{
+                System.out.println("\nGestion des préts:");
+                System.out.println("1. Enregistrer un prét");
+                System.out.println("2. Afficher tous les préts");
+                System.out.println("3. Retour au menu principale");
+                System.out.print("Votre choix: ");
+                String choixx = scanner.nextLine();
+                try{
+                    choix = Integer.parseInt(choixx);
+                    switch (choix) {
+                        case 1:
+                            enregistrerPret();
+                            break;
+                        case 2:
+                        if (prets.size() == 0){
+                            System.out.println("\nPas de pret enregistrer!");
+                        }
+                        else{
+                            afficherPrets();
+                        }
+                        break;
+                        case 3:
+                            break;
+                        default:
+                            System.out.println("\nChoix invalide.");
+                    }
+                }
+                catch(NumberFormatException e){
+                    System.out.println("\nVeuillez entrer un nombre entre 1 et 2 " + e.getMessage());
+                }
         }
+        while(choix != 3);
     }
-    catch(NumberFormatException e){
-        System.out.println("\nVeuillez entrer un nombre entre 1 et 2 " + e.getMessage());
-    }
-}
-while(choix != 3);
-}
-    
-    
-    /**
-     * Updates the payment array for a specified "pret"
-     * 
-     * @param idPret the identification of the "pret"
-     * @param nomVersement the number of the payment
-     * @param montant the amount to update
-     */
-    public void mettreAJourVersements(String idPret, int nomVersement, double montant) {
-        for (Prets pret : prets) {
-            if (pret.getIdPret().equals(idPret)) {
-                pret.versements[nomVersement - 1] += montant;
-                break;
-            }
-        }
-    }
+ 
 
-    /**
-     * Finds the periodic payment amount for a specified "pret"
-     * 
-     * @param idPret the identification of the "pret"
-     * @return the periodic payment amount
-     */
-    public double trouverMontantPeriodique(String idPret) {
-        for (Prets pret : prets) {
+    public Prets rechercherPret(String idPret){
+        for (Prets pret : prets) {  
             if (pret.getIdPret().equals(idPret)) {
-                return pret.getVersementPeriodique();
+                return pret;
             }
         }
-        return 0;
+        return null;
     }
-   
 }
+
