@@ -4,9 +4,16 @@ import java.util.Date;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-public class Remboursements {
+/**
+ * The class for remboursement (repayment)
+ */
 
-    private Scanner scanner = new Scanner(System.in);
+public class Remboursements {
+    /**
+     * An ArrayList, it extends the {@link ArrayList} class
+     */
+
+    private Scanner strscanner = new Scanner(System.in);
 
     private String idRemboursement;
     private String idPret;
@@ -14,6 +21,10 @@ public class Remboursements {
     private String dateRemboursement;
     private double versementPeriodique;
     private double montantReste;
+    /**
+     * An instance of class {@link Prets}
+     */
+    
 
     private ArrayList<Remboursements> remboursements;
     private ArrayList<Double> versements;  // Liste pour stocker les versements effectués
@@ -77,6 +88,18 @@ public class Remboursements {
         this.pret = pret;
     }
 
+    
+     
+     
+    /**
+     * * The constructor with parameters of class {@link #Remboursements}
+     * 
+     * @param idRemboursement
+     * @param idPret
+     * @param nomVersement
+     * @param versementPeriodique
+     * @param pret
+     */
     public Remboursements(String idRemboursement, String idPret, String nomVersement, double versementPeriodique, Prets pret) {
         this.idRemboursement = idRemboursement;
         this.idPret = idPret;
@@ -86,14 +109,24 @@ public class Remboursements {
         this.pret = pret;
         this.versements = new ArrayList<>();  // Initialiser la liste des versements
     }
-
+        
+    /**
+     * 
+     * @param pret
+     */
     public Remboursements(Prets pret) {
         this.remboursements = new ArrayList<>();
         this.pret = pret;
         this.versements = new ArrayList<>();
     }
 
+
+    /** 
+     * This method allow to save a remboursemnent
+    */
+    
     public void enregistrerRemboursement() {
+
         boolean verifyPret = false;
         Prets catchPret;
         int nbreEnregistrement = 0;
@@ -101,7 +134,7 @@ public class Remboursements {
 
         while (true) {
             System.out.print("Entrer l'ID du Pret: ");
-            idPret = scanner.nextLine();
+            idPret = strscanner.nextLine();
 
             catchPret = pret.rechercherPret(idPret);
 
@@ -111,18 +144,28 @@ public class Remboursements {
             } else {
                 System.out.println("ID du prêt introuvable");
                 System.out.println("Voulez-vous réessayer? (tapez 'fin' pour arrêter)");
-                String choix = scanner.nextLine();
+                String choix = strscanner.nextLine();
                 if (choix.equalsIgnoreCase("fin")) {
                     return; // Arrêter la méthode si l'utilisateur choisit "fin"
                 }
             }
         }
 
+        /**
+         *  This helps check if there's a loan for the entered ID. 
+         */
+
         if (verifyPret) {
             double montDu = catchPret.getMontantDu();
+            double montantEmprunte = catchPret.getMontantEmprunte();
+            double interet = catchPret.getInteret();
             double montantEnAttente = catchPret.getMontantEnAttente();
             double versementPeriodique = catchPret.getVersementPeriodique();
             int numeroVersement = catchPret.getNumeroVersement();
+
+            /**
+             * This condition is to verify is the mountains have to pay is already done
+             */
 
             if (montDu <= 0) {
                 System.out.println("========================================");
@@ -130,6 +173,7 @@ public class Remboursements {
                 System.out.println("========================================");
                 return;
             }
+
             while (true) {
                 System.out.println("\n==================== INFO ========================\n");
                 System.out.println("montant en attente : " + catchPret.getMontantEnAttente());
@@ -137,7 +181,7 @@ public class Remboursements {
                 System.out.println("montant dû : " + montDu);
                 System.out.println("--------------------------------------------------\n");
                 System.out.print("Entrer le montant  : ");
-                montantString = scanner.nextLine();
+                montantString = strscanner.nextLine();
                 System.out.println("===============================================");
                 try {
                     double convert = Double.parseDouble(montantString);
@@ -145,7 +189,7 @@ public class Remboursements {
                         break;
                     }
                     else{
-                        System.out.println("Le montant doit etre positif.");
+                        System.out.println("Le montant doit etre superieur a zero (0).");
                     }
                 } catch (InputMismatchException e) {
                     System.out.println("Essayez des nombre reels!");
@@ -154,8 +198,8 @@ public class Remboursements {
             double montant = Double.parseDouble(montantString);
 
             montantEnAttente += montant;
-            // a veriifye
-            if(montantEnAttente > versementPeriodique * 4){
+
+            if(montantEnAttente > (montantEmprunte + interet)){
                 System.out.println("Le montant entre + le montant en attente est superieur au somme dû " + montDu);
                 System.out.println("Verifiez si vous n'avez pas une somme en attente.");
                 return;
@@ -198,6 +242,10 @@ public class Remboursements {
         }
     }
 
+    /**
+     * This method allow to show the remboursement save
+     */
+
     public void afficherRemboursements() {
         int i = 1;
         for (Remboursements remboursement : remboursements) {
@@ -211,6 +259,10 @@ public class Remboursements {
         }
     }
 
+    /**
+     * This method allows for managing refunds. 
+     */
+
     public void gererRemboursements() {
         int choix = 0;
         do {
@@ -219,7 +271,7 @@ public class Remboursements {
             System.out.println("2. Afficher tous les Remboursements");
             System.out.println("3. Retour au menu principal");
             System.out.print("Votre choix: ");
-            String choixx = scanner.nextLine();
+            String choixx = strscanner.nextLine();
 
             try {
                 choix = Integer.parseInt(choixx);

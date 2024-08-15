@@ -25,7 +25,7 @@ public class Prets {
     private int numeroVersement = 1;
     private static int countPret = 1;
 
-    Scanner scanner = new Scanner(System.in);
+    Scanner strscanner = new Scanner(System.in);
     /**
      * An ArrayList, it extends the {@link ArrayList} class
     */
@@ -180,8 +180,8 @@ public class Prets {
     */
     public String valideInputText(String text){
         System.out.println(text);
-        String textCatch = scanner.nextLine();
-        String regex = "^[a-zA-Z][a-zA-Z0-9]{2,}$";
+        String textCatch = strscanner.nextLine();
+        String regex = "^[a-zA-Z][a-zA-Z0-9\\s-]{2,}$";
         if (Pattern.matches(regex, textCatch)){
             return textCatch;
         }
@@ -201,7 +201,7 @@ public class Prets {
             System.out.println("3. Pour 3éme Année");
             System.out.println("4. Pour 4éme Année");
             System.out.print("Votre choix: ");
-            String choixx = scanner.nextLine();
+            String choixx = strscanner.nextLine();
             try{
                 choix = Integer.parseInt(choixx);
 
@@ -212,7 +212,7 @@ public class Prets {
             }
         }
         catch (NumberFormatException e) {
-            System.out.println("\nVeuillez entrer un chiffre " + e.getMessage());
+            System.out.println("\nVeuillez entrer un chiffre ");
         }
         }
         return choix;
@@ -229,7 +229,7 @@ public class Prets {
             Double.parseDouble(money);
             return true;
         } catch (NumberFormatException e) {
-            System.out.println("Veuillez entrer un nombre valide "+ e.getMessage());
+            System.out.println("Veuillez entrer un nombre valide ");
         }
         return false;
     }
@@ -287,16 +287,16 @@ public class Prets {
             niveauEtudiant = niveau;
             // for the amount borrowed
             while (true){
-                scanner.nextLine();
+                strscanner.nextLine();
                 System.out.println("Entrer le montant emprunté");
-                String montant = scanner.nextLine();
+                String montant = strscanner.nextLine();
                 if (valideMoney(montant)){
                     montantEmprunte = Double.parseDouble(montant);
                     if(montantEmprunte > 0){
                         break;
                     }
                     else{
-                        System.out.println("Le montant doit etre positif.");
+                        System.out.println("Le montant doit etre superieur a zero (0).");
                     }
                 } else {
                     System.out.println("Veuillez entrer un nombre valide");
@@ -343,7 +343,7 @@ public class Prets {
                 System.out.println("2. Afficher tous les préts");
                 System.out.println("3. Retour au menu principale");
                 System.out.print("Votre choix: ");
-                String choixx = scanner.nextLine();
+                String choixx = strscanner.nextLine();
                 try{
                     choix = Integer.parseInt(choixx);
                     switch (choix) {
@@ -365,7 +365,7 @@ public class Prets {
                     }
                 }
                 catch(NumberFormatException e){
-                    System.out.println("\nVeuillez entrer un nombre entre 1 et 2 " + e.getMessage());
+                    System.out.println("\nVeuillez entrer un nombre entre 1 et 2 ");
                 }
         }
         while(choix != 3);
